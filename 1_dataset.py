@@ -1,5 +1,30 @@
 import cv2
 import os
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import storage
+from uuid import uuid4
+
+PROJECT_ID = "project-3eb4c"
+#my project id
+ 
+cred = credentials.Certificate("/home/ubuntu/다운로드/project-3eb4c-firebase-adminsdk-29sv1-229127f941.json") #(키 이[>
+default_app = firebase_admin.initialize_app(cred,{'storageBucket':f"{PROJECT_ID}.appspot.com"})
+#버킷은 바이너리 객체의 상위 컨테이너이다. 버킷은 Storage에서 데이터를 보관하는 기본 컨테이너이다.
+bucket = storage.bucket()#기본 버킷 사용
+
+def fileUpload(file):
+    blob = bucket.blob('image_store/'+file) #저장한 사진을 파이어베이스 storage의 image_store라는 이름의 디렉토리에 저>
+    #new token and metadata 설정
+    new_token = uuid4()
+    metadata = {"firebaseStorageDownloadTokens": new_token} #access token이 필요하다.
+    blob.metadata = metadata
+ 
+    #upload file
+    blob.upload_from_filename(filename='/home/ubuntu/pj/dataset/'+file, content_type='image/jpg') #파일이 저장된 주소[>
+    #debugging hello
+    print("hello ")
+
 
 cam = cv2.VideoCapture(0)  #캠 디바이스 아이디 0이면 기본값
 #cv2.VideoCapture : 장치관리자에 등록되어 있는 카메라 순서대로 인덱스 설정되어있다.
@@ -24,6 +49,8 @@ while(True):
     #gray 뒤에 값 1.3은 scaleFactor, 5는 minNeighbor을 의미한다.
     #이때 scaleFactor은 이미지 스케일에서 이미지 크기를 줄이는 방법을 지정하는 매개 변수이다. 크기를 줄여서 발견될 가능성을 높이는 것을 의미한다
     #minNeighbors 는 각 후보 사각형이 유재히야하는 이웃수를 지정하는 매개변수이며, 이때 값이 클수록 덜 감지되지만 품질이 높아진다.
+    filename = "User." + str(face_id) + '.' + str(count) + ".jpg"
+    fileUpload(filename)
 
     for (x,y,w,h) in faces:
         cv2.rectangle(img, (x,y), (x+w,y+h), (255,0,0), 2)     
@@ -33,7 +60,7 @@ while(True):
         cv2.imshow('image', img)    #인식할때 화면 보여줌
     k = cv2.waitKey(100) & 0xff #  'ESC' 누르면 취소
     if k == 27:
-        break
+         break
     elif count >= 30: # 얼굴인식 러닝을 위해 사진을 찍을 표본수 #30장
          break
 # Do a bit of cleanup
