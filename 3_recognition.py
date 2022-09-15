@@ -3,6 +3,8 @@ import cv2
 import numpy as np
 import os
 import time 
+import datetime
+import picamera
 
 GPIO.setmode(GPIO.BCM)
 PIR_PIN = 17 # OUT pin number
@@ -77,6 +79,18 @@ try:
                     f.write(now.strftime('%Y-%m-%d %H:%M:%S'))
                     f.close()
                     confidence = "  {0}%".format(round(100 - confidence))
+                    
+                    #camera = picamera.PiCamera()
+                    nowTime = datetime.datetime.today()
+                    frileName = nowTime.strftime('%T-%m-%d %H:%M:%S')
+                    src = '#저장위치'
+                    
+                    camera.framerate=30 #카메라 화소설정
+                    camera.start_recordeing(src + fileName + 'testVid.h2654')
+                    camera.start_preview()
+                    time.sleep(10) # 영상의 시간 설정
+                    camera.stop_recording()
+                    camera.stop_preview()
 
                 cv2.putText(img, str(id), (x+5,y-5), font, 1, (255,255,255), 2)     #화면에 띄우는 창에 사용자 이름 띄워줌
                 cv2.putText(img, str(confidence), (x+5,y+h-5), font, 1, (255,255,0), 1)  #얼마나 일치하는지 값을 보여줌
