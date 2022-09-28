@@ -1,0 +1,16 @@
+import os
+class fileread():
+    file_list = os.listdir('/home/serv/Desktop/upload2')
+    file_name = []
+    for file in file_list:
+        if file.count(".") == 1:
+            name = file.split('.')[0]
+            file_name.append(name)
+        else:
+            for k in range(len(file)-1,0,-1):
+                if file[k]=='.':
+                    file_name.append(file[:k])
+                    break
+    with open("test.txt","w") as file:
+        file.write(str(file_name))
+    print("succes")
